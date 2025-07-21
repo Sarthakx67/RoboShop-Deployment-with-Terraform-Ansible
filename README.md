@@ -1,6 +1,8 @@
-# RoboShop-Deployment-Using-Terraform-Ansible-on-AWS
+# RoboShop-Application-Deployment-Using-Terraform-Ansible-on-AWS
 
 This repository provides Terraform configurations to provision the complete infrastructure for the "RoboShop" e-commerce application on Amazon Web Services (AWS). This project automates the setup of all necessary networking, compute, and security resources. It also includes an automated process for configuring the application's various microservices using an Ansible server.
+
+![RoboShop Live Demo](./assets/RoboShop-Deployment.gif)
 
 ## Table of Contents
 
@@ -18,6 +20,8 @@ This repository provides Terraform configurations to provision the complete infr
 
 This Terraform project provisions a comprehensive and scalable architecture on AWS, which includes:
 
+![RoboShop Architecture Diagram](./assets/roboshop-architecture.png)
+
 *   **Virtual Private Cloud (VPC):** A custom VPC is created with dedicated public, private, and database subnets. For enhanced availability, these subnets are distributed across two different availability zones.
 *   **Internet Gateway (IGW):** An IGW is attached to the VPC to facilitate communication between the resources within the VPC and the public internet.
 *   **Security Groups:** For ease of setup in a development environment, a security group is configured to permit all incoming traffic.
@@ -32,7 +36,6 @@ To successfully deploy this infrastructure, please ensure that you have the foll
 
 *   **Terraform:** This project is designed to work with Terraform version 6.0 or a later version.
 *   **AWS Account:** An active AWS account is required. Your AWS credentials must be configured to allow Terraform to create resources. This can be achieved by configuring the AWS CLI or by setting the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` as environment variables.
-*   **EC2 Key Pair:** You must have an existing EC2 key pair named `EC2-key` in the `ap-south-1` region.
 *   **Git:** Git needs to be installed as it is used to clone the required modules from their GitHub repositories.
 
 ## How to Use This Repository
@@ -41,8 +44,8 @@ Follow these steps to deploy the RoboShop infrastructure:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone <your-repository-url>
-    cd <repository-directory>
+    git clone https://github.com/Sarthakx67/RoboShop-Deployment-with-Terraform-Ansible.git
+    cd RoboShop-Deployment-with-Terraform-Ansible
     ```
 
 2.  **Initialize Terraform:**
@@ -65,11 +68,15 @@ Follow these steps to deploy the RoboShop infrastructure:
     ```
     Please note that this process may take several minutes to complete.
 
+    ![RoboShop Terraform Configuration](./assets/RoboShop-terraform-1.png)
+
 5.  **Destroy the Infrastructure:**
     To avoid ongoing charges, you can destroy all the created resources when they are no longer needed.
     ```bash
     terraform destroy --auto-approve
     ```
+
+    ![RoboShop Terraform Configuration](./assets/RoboShop-terraform-2.png)    
 
 ## Modular Infrastructure
 
@@ -130,6 +137,8 @@ The `ec2_ansible` module is launched with a `user_data` script designed to autom
     *   Dispatch
 
 All logs generated during this provisioning process are saved to `/tmp/roboshop-ansible-YYYY-MM-DD.log` on the Ansible server.
+
+![RoboShop Ansible-Playbook Provisioning](./assets/RoboShop-Ansible-Configurations.png)
 
 ## Infrastructure Outputs
 
