@@ -15,10 +15,14 @@ variable "project_name" {
   default = "roboshop"
 }
 variable "vpc_tags" {
-    default = "roboshop-vpc"
+    default = {
+      Name = "roboshop-vpc"
+    }
 }
 variable "igw_tags" {
-    default = "roboshop-igw"
+    default = {
+      Name = "roboshop-igw"
+    }
 }
 variable "public_subnet_cidr_block" {
   default = ["10.0.1.0/24","10.0.2.0/24"]
