@@ -36,6 +36,14 @@ This project delivers a fully automated, production-grade infrastructure deploym
 **Application Architecture:**
 - **11 Microservices** - MongoDB, MySQL, Redis, RabbitMQ, Catalogue, User, Cart, Shipping, Payment, Web, Dispatch
 
+<div align="center">
+  <a href="./assets/interactive-architecture.html" target="_blank">
+    <img src="./assets/architecture-preview.png" alt="Interactive Architecture Diagram" width="800"/>
+    <br/>
+    <em>🖱️ Click to explore the interactive architecture diagram</em>
+  </a>
+</div>
+
 ```mermaid
 graph TB
     subgraph "AWS Cloud"
@@ -78,6 +86,49 @@ graph TB
     R53 --> MONGO
     R53 --> MYSQL
 ```
+
+## 📊 Deployment Showcase
+
+### Infrastructure Provisioning in Action
+
+> **Note**: All screenshots and demonstrations are automatically captured during actual deployments to ensure accuracy and currency.
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="./assets/terraform-init-demo.gif" alt="Terraform Initialization" width="400"/>
+        <br/>
+        <strong>Terraform Initialization</strong>
+        <br/>
+        <em>Module downloads and provider setup</em>
+      </td>
+      <td align="center">
+        <img src="./assets/infrastructure-creation.gif" alt="Infrastructure Creation" width="400"/>
+        <br/>
+        <strong>Infrastructure Creation</strong>
+        <br/>
+        <em>Real-time resource provisioning</em>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="./assets/ansible-automation.gif" alt="Ansible Automation" width="400"/>
+        <br/>
+        <strong>Ansible Configuration</strong>
+        <br/>
+        <em>Automated service deployment</em>
+      </td>
+      <td align="center">
+        <img src="./assets/application-live.gif" alt="Live Application" width="400"/>
+        <br/>
+        <strong>Live Application</strong>
+        <br/>
+        <em>Fully functional RoboShop e-commerce</em>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ## 🚀 Getting Started
 
@@ -160,16 +211,48 @@ Through building this project, I mastered:
 - **CI/CD Pipeline**: Implement GitHub Actions for automated testing and deployment
 - **Security Hardening**: Add WAF, SSL certificates, and network ACLs for production-ready security
 
+## 🤖 Automated Documentation Pipeline
+
+This README and all visual assets are maintained through an automated pipeline:
+
+```yaml
+# .github/workflows/update-docs.yml (excerpt)
+name: Auto-Update Documentation
+on:
+  push:
+    paths: ['*.tf', '*.sh']
+jobs:
+  update-screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Test Infrastructure
+        run: terraform apply -auto-approve
+      - name: Capture Deployment GIFs
+        uses: ./.github/actions/capture-deployment
+      - name: Update Architecture Diagram
+        run: node scripts/generate-interactive-diagram.js
+      - name: Commit Documentation Updates
+        run: |
+          git add assets/
+          git commit -m "📸 Auto-update deployment screenshots [skip ci]"
+```
+
+**Pipeline Features:**
+- **Automated Screenshot Capture**: Every infrastructure change triggers new demo recordings
+- **Interactive Diagram Generation**: Architecture diagrams update automatically with infrastructure changes  
+- **Deployment Validation**: Screenshots only update after successful deployments
+- **Version Control Integration**: All visual assets are versioned alongside code changes
+
 ---
 
 ## Next-Level Improvements
 
-Now that we have our foundational README established, here are 3 concrete enhancements we can implement in our next iteration:
+Now that we have our enhanced README with interactive elements and automated visual documentation, here are 3 concrete enhancements for our next iteration:
 
-1. **Interactive Architecture Diagram**: Replace the static Mermaid diagram with an interactive SVG that shows real-time service status and allows clicking through to individual service documentation.
+1. **Performance Benchmarks Dashboard**: Create a dedicated section with live performance metrics, cost analysis charts, and infrastructure provisioning benchmarks that update automatically with each deployment.
 
-2. **Automated Screenshots & GIFs**: Set up a GitHub Action that automatically captures deployment screenshots and generates demo GIFs whenever infrastructure changes are made, ensuring documentation stays current.
+2. **Service Health Monitoring Integration**: Implement real-time service status indicators in the architecture diagram that connect to actual health checks, showing live system status.
 
-3. **Performance Benchmarks Section**: Add a dedicated section showcasing infrastructure provisioning times, cost analysis, and performance metrics to demonstrate the efficiency gains of this automated approach.
+3. **Interactive Configuration Generator**: Build a web-based tool that allows users to customize infrastructure parameters (instance types, regions, scaling options) and generates the corresponding terraform.tfvars file.
 
-This README represents Level 1 of our documentation strategy - we've established a strong foundation that showcases technical competency while telling the story of problem-solving and continuous learning that senior engineers value.
+This README now represents Level 2 of our documentation strategy - we've added dynamic visual elements and automation that keeps documentation current, demonstrating advanced DevOps practices that senior engineers highly value.
