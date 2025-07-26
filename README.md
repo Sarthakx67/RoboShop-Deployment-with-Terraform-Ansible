@@ -1,315 +1,181 @@
-# 🛒 RoboShop E-Commerce Infrastructure Automation
-
-*Enterprise-grade microservices deployment with Terraform & Ansible on AWS*
-
-[![Terraform](https://img.shields.io/badge/Terraform-1.0+-623CE4?logo=terraform&logoColor=white)](https://terraform.io)
-[![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com)
-[![Ansible](https://img.shields.io/badge/Ansible-Automation-EE0000?logo=ansible&logoColor=white)](https://ansible.com)
-[![Infrastructure](https://img.shields.io/badge/Infrastructure-as--Code-blue)](https://github.com)
-
-![RoboShop Demo](./assets/roboshop-demo.gif)
-
-**One command. Complete e-commerce platform. Production ready.**
-
-This project automatically provisions and configures a full-stack e-commerce microservices architecture on AWS using Infrastructure as Code principles. What typically takes days of manual setup becomes a single `terraform apply` command.
-
----
-
-## 🎯 Why This Project Exists
-
-**The Problem:** Deploying microservices architectures manually is complex, error-prone, and doesn't scale. Teams waste weeks setting up infrastructure, configuring services, and managing dependencies.
-
-**My Solution:** A fully automated infrastructure pipeline that:
-- ⚡ Provisions complete AWS environment in under 10 minutes
-- 🔧 Automatically configures 11 interconnected microservices
-- 🌐 Sets up production-ready networking and DNS
-- 📊 Stores all configuration in centralized parameter store
-
-**Why I Built This:** To demonstrate my expertise in cloud architecture, automation, and DevOps best practices. This showcases my ability to solve real infrastructure challenges that companies face daily.
-
----
-
-## 🏗️ Architecture Overview
-
-```mermaid
-graph TB
-    subgraph "🌐 AWS Cloud Environment"
-        subgraph "📡 Public Subnet (ap-south-1a)"
-            WEB["🖥️ Web Server<br/>Frontend UI"]
-            ANSIBLE["⚙️ Ansible Controller<br/>Automation Hub"]
-        end
-        
-        subgraph "🔒 Private Subnet (ap-south-1a)"
-            subgraph "💾 Data Layer"
-                MONGO["🍃 MongoDB<br/>Product Catalog"]
-                MYSQL["🐬 MySQL<br/>User & Orders"]
-                REDIS["⚡ Redis<br/>Session Cache"]
-            end
-            
-            subgraph "🔄 Message Queue"
-                RABBIT["🐰 RabbitMQ<br/>Event Streaming"]
-            end
-            
-            subgraph "🚀 Application Services"
-                CAT["📦 Catalogue<br/>Product API"]
-                USER["👤 User Service<br/>Authentication"]
-                CART["🛒 Shopping Cart<br/>Session Mgmt"]
-                SHIP["📦 Shipping<br/>Logistics"]
-                PAY["💳 Payment<br/>Transactions"]
-                DISP["📨 Dispatch<br/>Order Processing"]
-            end
-        end
-        
-        IGW["🚪 Internet Gateway"]
-        R53["🌍 Route 53<br/>DNS Management"]
-        SSM["📋 SSM Parameter Store<br/>Configuration Hub"]
-    end
-    
-    IGW --> WEB
-    IGW --> ANSIBLE
-    
-    ANSIBLE -.->|"Configures All Services"| MONGO
-    ANSIBLE -.->|"Deploys & Manages"| CAT
-    ANSIBLE -.->|"Automates Setup"| USER
-    
-    WEB --> CAT
-    CAT --> MONGO
-    USER --> MYSQL
-    CART --> REDIS
-    SHIP --> MYSQL
-    PAY --> RABBIT
-    DISP --> RABBIT
-    
-    R53 --> WEB
-    R53 -.-> CAT
-    R53 -.-> USER
-```
-
----
-
-## 🛠️ Technology Stack
-
-### **Infrastructure Layer**
-- **Terraform** - Infrastructure provisioning and state management
-- **AWS VPC** - Custom networking with public/private subnet architecture
-- **AWS EC2** - Compute instances with optimized placement strategies
-- **AWS Route53** - DNS management and service discovery
-- **AWS SSM** - Centralized parameter and secrets management
-
-### **Automation & Configuration**
-- **Ansible** - Configuration management and application deployment
-- **Bash Scripting** - System initialization and bootstrapping
-- **Git Modules** - Reusable infrastructure components
-
-### **Application Services**
-| Service | Technology | Purpose |
-|---------|------------|---------|
-| **Web** | Nginx + Node.js | Frontend application server |
-| **Catalogue** | Node.js + Express | Product catalog management |
-| **User** | Node.js + Express | User authentication & profiles |
-| **Cart** | Node.js + Express | Shopping cart functionality |
-| **Shipping** | Java + Spring Boot | Logistics and delivery |
-| **Payment** | Python + Flask | Payment processing |
-| **Dispatch** | Go | Order fulfillment |
-| **MongoDB** | NoSQL Database | Product and catalog data |
-| **MySQL** | SQL Database | User data and transactions |
-| **Redis** | In-memory Cache | Session management |
-| **RabbitMQ** | Message Broker | Asynchronous communication |
-
----
+# RoboShop-Application-Deployment-Using-Terraform-Ansible-on-AWS
 
-## 🚀 Quick Start Guide
-
-### Prerequisites
-```bash
-# Required tools
-terraform --version  # v1.0+
-aws --version        # AWS CLI configured
-git --version        # Git for module cloning
-```
-
-### Deploy Infrastructure
-```bash
-# 1. Clone repository
-git clone https://github.com/Sarthakx67/RoboShop-Deployment-with-Terraform-Ansible.git
-cd RoboShop-Deployment-with-Terraform-Ansible
-
-# 2. Initialize Terraform
-terraform init
-
-# 3. Review deployment plan
-terraform plan
-
-# 4. Deploy complete infrastructure
-terraform apply --auto-approve
-```
-
-### Access Your E-Commerce Platform
-```bash
-# Application URL (after ~8-10 minutes)
-echo "🛒 RoboShop: http://web.stallions.space"
-
-# Individual service endpoints
-echo "📦 Catalogue: http://catalogue.stallions.space"
-echo "👤 User API: http://user.stallions.space"
-echo "🛒 Cart API: http://cart.stallions.space"
-```
-
-### Clean Up Resources
-```bash
-terraform destroy --auto-approve
-```
-
----
-
-## 💡 Engineering Deep Dive
-
-### Challenge: Zero-Touch Service Configuration
-
-**Problem:** Managing configuration across 11 microservices with complex interdependencies.
-
-**Solution:** I implemented an intelligent Ansible automation system that:
-
-```bash
-# Automated service deployment order
-MongoDB → Catalogue → Redis → User → Cart → Web
-MySQL → Shipping → RabbitMQ → Payment → Dispatch
-```
-
-**Key Innovation:** Dynamic service discovery using Route53 DNS records allows services to find each other automatically, eliminating hardcoded IP addresses and making the system truly scalable.
-
-### Technical Breakthrough: Modular Infrastructure Design
-
-I architected this using a sophisticated module system:
-
-```hcl
-# VPC Module - Complete networking stack
-module "vpc" {
-  source = "git::https://github.com/Sarthakx67/terraform-aws-vpc-module.git"
-  # Handles: VPC, Subnets, IGW, Route Tables, NACLs
-}
-
-# Security Module - Centralized access control
-module "security_group" {
-  source = "git::https://github.com/Sarthakx67/RoboShop-Security-Group-Module.git"
-  # Handles: Security groups, ingress/egress rules
-}
+This repository provides Terraform configurations to provision the complete infrastructure for the "RoboShop" e-commerce application on Amazon Web Services (AWS). This project automates the setup of all necessary networking, compute, and security resources. It also includes an automated process for configuring the application's various microservices using an Ansible server.
 
-# EC2 Module - Compute resource management
-module "ec2_instance" {
-  source = "terraform-aws-modules/ec2-instance/aws"
-  # Handles: Instance provisioning, placement, tagging
-}
-```
+![RoboShop Live Demo](./assets/RoboShop-Deployment.gif)
 
-**Impact:** This modular approach increased code reusability by 85% and reduced deployment time from hours to minutes.
+## Table of Contents
 
-### Advanced Automation Insights
+- [Architectural Overview](#architectural-overview)
+- [Prerequisites](#prerequisites)
+- [How to Use This Repository](#how-to-use-this-repository)
+- [Modular Infrastructure](#modular-infrastructure)
+- [Detailed Configuration](#detailed-configuration)
+- [Automated Ansible Provisioning](#automated-ansible-provisioning)
+- [Infrastructure Outputs](#infrastructure-outputs)
+- [AWS Systems Manager (SSM) Parameter Store Integration](#aws-systems-manager-ssm-parameter-store-integration)
+- [Customizable Variables](#customizable-variables)
 
-Through building this project, I mastered:
+## Architectural Overview
 
-- **Infrastructure Dependencies:** Leveraging Terraform's dependency graph for correct resource ordering
-- **State Management:** Using remote state and SSM Parameter Store for cross-stack communication
-- **Configuration Management:** Implementing idempotent Ansible playbooks with proper error handling
-- **Service Discovery:** Automated DNS-based service registration and discovery
+This Terraform project provisions a comprehensive and scalable architecture on AWS, which includes:
 
----
+![RoboShop Architecture Diagram](./assets/roboshop-architecture.png)
 
-## 📊 Infrastructure Specifications
+*   **Virtual Private Cloud (VPC):** A custom VPC is created with dedicated public, private, and database subnets. For enhanced availability, these subnets are distributed across two different availability zones.
+*   **Internet Gateway (IGW):** An IGW is attached to the VPC to facilitate communication between the resources within the VPC and the public internet.
+*   **Security Groups:** For ease of setup in a development environment, a security group is configured to permit all incoming traffic.
+*   **EC2 Instances:** A suite of Amazon EC2 instances is launched to host the various microservices that constitute the RoboShop application. The 'web' instance is deployed in a public subnet for external access, while the remaining application and database instances reside in private subnets for enhanced security.
+*   **Ansible Server:** A dedicated EC2 instance is configured as an Ansible server. This server automates the provisioning and configuration of all other EC2 instances with their respective application components.
+*   **Route 53 Records:** To simplify access, 'A' records are automatically created in AWS Route 53 for each EC2 instance. These records resolve to the respective IP addresses of the instances.
+*   **SSM Parameters:** Key infrastructure identifiers, such as the VPC ID, subnet IDs, and security group ID, are systematically stored in the AWS Systems Manager (SSM) Parameter Store. This allows for centralized management and easy retrieval of these values.
 
-### Network Architecture
-```
-VPC CIDR: 10.0.0.0/16
-├── Public Subnets:    10.0.1.0/24, 10.0.2.0/24
-├── Private Subnets:   10.0.11.0/24, 10.0.12.0/24
-└── Database Subnets:  10.0.21.0/24, 10.0.22.0/24
+## Prerequisites
 
-Availability Zones: ap-south-1a, ap-south-1b
-```
+To successfully deploy this infrastructure, please ensure that you have the following prerequisites in place:
 
-### Deployment Metrics
-- **⚡ Provisioning Time:** 8-10 minutes
-- **🔧 Services Deployed:** 11 microservices
-- **🌐 DNS Records:** 12 Route53 A records
-- **📋 Configuration Parameters:** 5 SSM parameters
-- **💰 Estimated Cost:** ~$15/month (all t2.micro instances)
+*   **Terraform:** This project is designed to work with Terraform version 6.0 or a later version.
+*   **AWS Account:** An active AWS account is required. Your AWS credentials must be configured to allow Terraform to create resources. This can be achieved by configuring the AWS CLI or by setting the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` as environment variables.
+*   **Git:** Git needs to be installed as it is used to clone the required modules from their GitHub repositories.
 
----
+## How to Use This Repository
 
-## 🔮 Roadmap & Future Enhancements
+Follow these steps to deploy the RoboShop infrastructure:
 
-### Phase 1: High Availability
-- [ ] Multi-AZ deployment with load balancers
-- [ ] Auto Scaling Groups for dynamic scaling
-- [ ] RDS with Multi-AZ for database tier
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/Sarthakx67/RoboShop-Deployment-with-Terraform-Ansible.git
+    cd RoboShop-Deployment-with-Terraform-Ansible
+    ```
 
-### Phase 2: Production Hardening
-- [ ] SSL/TLS certificates with ACM
-- [ ] WAF and security hardening
-- [ ] VPC Flow Logs and CloudTrail
-- [ ] Secrets Manager integration
+2.  **Initialize Terraform:**
+    To initialize the Terraform working directory, which involves downloading the necessary providers and modules, execute the command below.
+    ```bash
+    terraform init
+    ```
 
-### Phase 3: Observability
-- [ ] CloudWatch dashboards and alarms
-- [ ] ELK stack for centralized logging
-- [ ] Prometheus + Grafana monitoring
-- [ ] Distributed tracing with X-Ray
+3.  **Review the Execution Plan:**
+    It is a best practice to review the execution plan before making any changes to your infrastructure.
+    ```bash
+    terraform plan
+    ```
+    This command provides a detailed summary of all the resources that will be created, modified, or destroyed.
 
-### Phase 4: DevOps Excellence
-- [ ] GitOps with ArgoCD
-- [ ] Infrastructure testing with Terratest
-- [ ] Blue-green deployment pipeline
-- [ ] Chaos engineering with Chaos Monkey
+4.  **Apply the Terraform Configuration:**
+    If you are satisfied with the execution plan, you can proceed to apply the configuration and create the infrastructure on AWS.
+    ```bash
+    terraform apply --auto-approve
+    ```
+    Please note that this process may take several minutes to complete.
 
----
+    ![RoboShop Terraform Configuration](./assets/RoboShop-terraform-1.png)
 
-## 🤝 Contributing
+5.  **Destroy the Infrastructure:**
+    To avoid ongoing charges, you can destroy all the created resources when they are no longer needed.
+    ```bash
+    terraform destroy --auto-approve
+    ```
 
-This project welcomes contributions! Here's how you can help:
+    ![RoboShop Terraform Configuration](./assets/RoboShop-terraform-2.png)    
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
+## Modular Infrastructure
 
-### Development Setup
-```bash
-# Install pre-commit hooks
-pre-commit install
+To promote reusability and maintain a clean project structure, this project is built using several Terraform modules:
 
-# Run terraform validation
-terraform fmt -recursive
-terraform validate
+*   **VPC Module (`module "vpc"`)**
+    *   **Source:** `git::https://github.com/Sarthakx67/terraform-aws-vpc-module.git`
+    *   **Description:** This module is responsible for provisioning the VPC, all subnets (public, private, and database), and the internet gateway.
 
-# Test Ansible playbooks
-ansible-playbook --syntax-check main.yaml
-```
+*   **Security Group Module (`module "security_group"`)**
+    *   **Source:** `git::https://github.com/Sarthakx67/RoboShop-Security-Group-Module.git`
+    *   **Description:** This module creates a security group based on user-defined ingress rules. In this specific project, it has been configured to allow all traffic.
 
----
+*   **EC2 Instance Module (`module "ec2_instance"`)**
+    *   **Source:** `terraform-aws-modules/ec2-instance/aws`
+    *   **Description:** This module creates the EC2 instances required for each of the RoboShop microservices by iterating through a predefined map of instances.
 
-## 📝 License
+*   **Ansible Server Module (`module "ec2_ansible"`)**
+    *   **Source:** `terraform-aws-modules/ec2-instance/aws`
+    *   **Description:** This module is dedicated to deploying the Ansible server instance. It utilizes a `user_data` script to automate the setup and subsequent execution of the Ansible playbooks.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙋‍♂️ About the Developer
-
-Built with ❤️ by **Sarthak** - A passionate DevOps engineer and cloud architect focused on automation, scalability, and infrastructure excellence.
-
-**Connect with me:**
-- 🐙 GitHub: [@Sarthakx67](https://github.com/Sarthakx67)
-- 💼 LinkedIn: [Your LinkedIn Profile]  
-- 📧 Email: [Your Email]
-- 🌐 Portfolio: [Your Portfolio Website]
-
----
-
-<div align="center">
-  <strong>⭐ Star this repository if it helped you learn something new!</strong>
-  <br><br>
-  <em>This project demonstrates enterprise-level infrastructure automation and DevOps best practices.</em>
-</div>
-
----
+*   **Route 53 Records Module (`module "records"`)**
+    *   **Source:** `terraform-aws-modules/route53/aws//modules/records`
+    *   **Description:** This module is used to create the necessary DNS records in the specified Route 53 hosted zone, making it easier to access the deployed EC2 instances.
+
+## Detailed Configuration
+
+### Networking
+
+*   **VPC CIDR Block:** The default CIDR block for the VPC is `10.0.0.0/16`.
+*   **Public Subnets:** The public subnets are configured with `10.0.1.0/24` and `10.0.2.0/24`.
+*   **Private Subnets:** The private subnets are set up with `10.0.11.0/24` and `10.0.12.0/24`.
+*   **Database Subnets:** The database subnets are assigned `10.0.21.0/24` and `10.0.22.0/24`.
+*   **Availability Zones:** To ensure high availability, the infrastructure is deployed across the `ap-south-1a` and `ap-south-1b` availability zones.
+
+### Security
+
+*   The project establishes a security group named "allow-all," which permits all incoming and outgoing traffic. **Disclaimer:** This configuration is intended for development and testing purposes only and is not recommended for production environments.
+
+## Automated Ansible Provisioning
+
+The `ec2_ansible` module is launched with a `user_data` script designed to automate the setup and configuration of all the RoboShop application components. The script carries out the following steps:
+
+1.  It begins by installing the Extra Packages for Enterprise Linux (EPEL) and Ansible.
+2.  Next, it clones the `RoboShop-Ansible-Roles` repository from GitHub.
+3.  It then adjusts the permissions for the EC2 key to ensure proper access.
+4.  Finally, it runs a sequence of Ansible playbooks to install and configure all the necessary microservices, including:
+    *   MongoDB
+    *   Catalogue
+    *   Redis
+    *   User
+    *   Cart
+    *   Web Server
+    *   MySQL
+    *   Shipping
+    *   RabbitMQ
+    *   Payment
+    *   Dispatch
+
+All logs generated during this provisioning process are saved to `/tmp/roboshop-ansible-YYYY-MM-DD.log` on the Ansible server.
+
+![RoboShop Ansible-Playbook Provisioning](./assets/RoboShop-Ansible-Configurations.png)
+
+## Infrastructure Outputs
+
+Upon successful deployment, Terraform will provide the following outputs:
+
+*   **public\_subnet\_ids:** A list containing the IDs of the newly created public subnets.
+*   **private\_subnet\_ids:** A list containing the IDs of the newly created private subnets.
+*   **database\_subnet\_ids:** A list containing the IDs of the newly created database subnets.
+
+## AWS Systems Manager (SSM) Parameter Store Integration
+
+This project is designed to store critical infrastructure details in the AWS SSM Parameter Store under the `/roboshop/dev/` path. This approach allows other applications and infrastructure components to easily retrieve these configuration values. The following parameters will be created:
+
+*   `/roboshop/dev/vpc_id`
+*   `/roboshop/dev/public_subnet_ids`
+*   `/roboshop/dev/private_subnet_ids`
+*   `/roboshop/dev/database_subnet_ids`
+*   `/roboshop/dev/allow_all_security_group_id`
+
+## Customizable Variables
+
+You can customize the following variables by creating a `terraform.tfvars` file or by passing them as arguments on the command line.
+
+| Variable | Description | Default Value |
+|---|---|---|
+| `cidr_block` | The CIDR block for the VPC. | `"10.0.0.0/16"` |
+| `common_tags` | A map of tags to be applied to all resources. | `{ Project = "roboshop-vpc", Environment = "DEV", Terraform = true }` |
+| `env` | The name of the deployment environment. | `"dev"` |
+| `project_name` | The name designated for the project. | `"roboshop"` |
+| `vpc_tags` | Tags specifically for the VPC. | `{ Name = "roboshop-vpc" }` |
+| `igw_tags` | Tags specifically for the Internet Gateway. | `{ Name = "roboshop-igw" }` |
+| `public_subnet_cidr_block` | A list of CIDR blocks for the public subnets. | `["10.0.1.0/24", "10.0.2.0/24"]` |
+| `availability_zone` | A list of availability zones for subnet deployment. | `["ap-south-1a", "ap-south-1b"]` |
+| `private_subnet_cidr_block`| A list of CIDR blocks for the private subnets. | `["10.0.11.0/24", "10.0.12.0/24"]` |
+| `database_subnet_cidr_block`| A list of CIDR blocks for the database subnets. | `["10.0.21.0/24", "10.0.22.0/24"]` |
+| `sg_name` | The designated name for the security group. | `"allow-all"` |
+| `sg_description` | The description for the security group. | `"allow-all"` |
+| `security_group_ingress_rule`| A list of maps that define the ingress rules for the security group. | `[{ description = "allow-all", cidr_blocks = ["0.0.0.0/0"], from_port = 0, protocol = "-1", to_port = 0 }]` |
+| `instances` | A map of EC2 instances to be created, specifying their names and instance types. | `{ mongodb = "t2.micro", mysql = "t2.micro", redis = "t2.micro", rabbitmq = "t2.micro", catalogue = "t2.micro", user = "t2.micro", cart = "t2.micro", shipping = "t2.micro", payment = "t2.micro", web = "t2.micro", dispatch = "t2.micro" }` |
+| `zone_name` | The name of the Route 53 hosted zone where DNS records will be created. | `"stallions.space"` |
